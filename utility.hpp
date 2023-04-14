@@ -5,9 +5,9 @@
 
 namespace sjtu {
 
-
 template <class T>
 T* upper_bound(T* first,T* last, T key) {
+    if(first==last)return first;
     last--;
     if(key>=*last)return last+1;
     while (first < last) {
@@ -22,6 +22,7 @@ T* upper_bound(T* first,T* last, T key) {
 }
 template <class T>
 T* lower_bound(T *first,T *last, T key) {
+    if(first==last)return first;
     last--;
     if(key>*last)return last+1;
     while (first < last) {

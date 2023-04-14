@@ -134,6 +134,7 @@ public:
         getnode(temp,num);
         int t=sjtu::lower_bound(temp.value,temp.value+temp.now_num,data(key,T()))-temp.value;
         //std::cout<<t<<" 114514";
+        if(t==temp.now_num)--t;
         int x=t;
         while(true){
             if(x==-1){
@@ -421,7 +422,7 @@ public:
                 getnode(temp_fa,temp.pos_of_fa);
                 int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
                                 temp.value[size_of_block/2-1])-temp_fa.value;
-                temp_fa.value[t]=temp_front.value[0];
+                temp_fa.value[t-1]=temp_front.value[0];//修改
                 writenode(temp,pos);
                 writenode(temp_front,temp.front_pos);
                 writenode(temp_fa,temp.pos_of_fa);
@@ -439,15 +440,27 @@ public:
         if(!judge(temp.front_pos,temp.pos_of_fa,temp_front)){
             getnode(temp_back,temp.back_pos);
             if(temp_back.now_num>size_of_block/2){
-                temp.value[size_of_block/2-1]=temp_back.value[0];
-                for(int i=0;i<temp_back.now_num-1;i++)temp_back.value[i]=temp_back.value[i+1];
+                // temp.value[size_of_block/2-1]=temp_back.value[0];
+                // for(int i=0;i<temp_back.now_num-1;i++)temp_back.value[i]=temp_back.value[i+1];
+                // temp_back.now_num--;
+                // temp.now_num++;
+                // node temp_fa;
+                // getnode(temp_fa,temp.pos_of_fa);
+                // int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
+                //                 temp.value[size_of_block/2-1])-temp_fa.value;
+                // temp_fa.value[t]=temp_back.value[0];
+                // writenode(temp,pos);
+                // writenode(temp_back,temp.back_pos);
+                // writenode(temp_fa,temp.pos_of_fa);
+                for(int i=temp.now_num;i>0;i--)temp.value[i]=temp.value[i-1];
+                temp.value[0]=temp_back.value[temp_back.now_num-1];
                 temp_back.now_num--;
                 temp.now_num++;
                 node temp_fa;
                 getnode(temp_fa,temp.pos_of_fa);
                 int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
-                                temp.value[size_of_block/2-1])-temp_fa.value;
-                temp_fa.value[t]=temp_back.value[0];
+                                 temp.value[1])-temp_fa.value;
+                temp_fa.value[t-1]=temp.value[0];
                 writenode(temp,pos);
                 writenode(temp_back,temp.back_pos);
                 writenode(temp_fa,temp.pos_of_fa);
@@ -472,22 +485,22 @@ public:
             getnode(temp_fa,temp.pos_of_fa);
             int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
                             temp.value[size_of_block/2-1])-temp_fa.value;
-            temp_fa.value[t]=temp_front.value[0];
+            temp_fa.value[t-1]=temp_front.value[0];
             writenode(temp,pos);
             writenode(temp_front,temp.front_pos);
             writenode(temp_fa,temp.pos_of_fa);
             return;
         }
         if(temp_back.now_num>size_of_block/2){
-            temp.value[size_of_block/2-1]=temp_back.value[0];
-            for(int i=0;i<temp_back.now_num-1;i++)temp_back.value[i]=temp_back.value[i+1];
+            for(int i=temp.now_num;i>0;i--)temp.value[i]=temp.value[i-1];
+            temp.value[0]=temp_back.value[temp_back.now_num-1];
             temp_back.now_num--;
             temp.now_num++;
             node temp_fa;
             getnode(temp_fa,temp.pos_of_fa);
             int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
-                            temp.value[size_of_block/2-1])-temp_fa.value;
-            temp_fa.value[t]=temp_back.value[0];
+                                temp.value[1])-temp_fa.value;
+            temp_fa.value[t-1]=temp.value[0];
             writenode(temp,pos);
             writenode(temp_back,temp.back_pos);
             writenode(temp_fa,temp.pos_of_fa);
@@ -505,8 +518,9 @@ public:
         int pos=find_pos(obj,head.pos_of_root);
         node temp;
         getnode(temp,pos);
-        int t=sjtu::lower_bound(temp.value,temp.value+temp.now_num,obj)-temp.value;
-        if(!(temp.value[t]==obj))return;
+        int t=sjtu::upper_bound(temp.value,temp.value+temp.now_num,obj)-temp.value;
+        if(!(temp.value[t-1]==obj))return;
+        t--;
         for(int i=t;i<temp.now_num;i++)temp.value[i]=temp.value[i+1];
         temp.now_num--;
         writenode(temp,pos);
