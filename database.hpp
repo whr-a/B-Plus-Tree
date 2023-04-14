@@ -34,7 +34,7 @@ public:
         }
         friend bool operator == (const data &obj1,const data &obj2){
             if(strcmp(obj1.key,obj2.key)==0 && obj1.value==obj2.value)return true;
-            else return false;
+            return false;
         }
         friend bool operator >= (const data &obj1,const data &obj2){
             if(strcmp(obj1.key,obj2.key)>0)return true;
@@ -85,6 +85,7 @@ public:
     };
     std::fstream opfile;
     start head;
+    //int cnt=0;
     void getstart(start &st){
         opfile.seekg(0);
         opfile.read(reinterpret_cast<char*>(&st),sizeof(st));
@@ -129,11 +130,11 @@ public:
         return finds(key,temp.edge[t]);
     }
     sjtu::vector<T> find(char* key){
+        //cnt++;
         int num=finds(key,head.pos_of_root);
         node temp;
         getnode(temp,num);
         int t=sjtu::lower_bound(temp.value,temp.value+temp.now_num,data(key,T()))-temp.value;
-        //std::cout<<t<<" 114514";
         if(t==temp.now_num)--t;
         int x=t;
         while(true){
@@ -198,7 +199,7 @@ public:
         writenode(temp,fa_pos);
         if(temp.now_num==size_of_block){
             node temp2;
-            int mid=size_of_block>>1;
+            int mid=size_of_block/2;
             temp2.now_num=mid-1;
             for(int i=mid+1;i<size_of_block;i++){
                 temp2.value[i-mid-1]=temp.value[i];
@@ -269,6 +270,7 @@ public:
         }
     }
     void test(bool typ){
+        //cnt++;
         if(typ==0)std::cout<<"****************insert"<<'\n';
         else std::cout<<"****************delete"<<'\n';
         std::cout<<"root:"<<head.pos_of_root<<'\n';
@@ -297,8 +299,6 @@ public:
         temp.value[t]=obj;
         temp.now_num++;
         writenode(temp,pos);
-        node tempx;
-        getnode(tempx,pos);
         if(temp.now_num==size_of_block)devideleaf(pos);
         //以下为调试信息
         //test(0);
@@ -363,6 +363,7 @@ public:
                         rightbro.value[i]=rightbro.value[i+1];
                         rightbro.edge[i]=rightbro.edge[i+1];
                     }
+                    rightbro.edge[rightbro.now_num-1]=rightbro.edge[rightbro.now_num];
                     rightbro.now_num--;
                     temp.now_num++;
                     fa.value[tx]=getleft(rightbro.edge[0]);
@@ -440,18 +441,6 @@ public:
         if(!judge(temp.front_pos,temp.pos_of_fa,temp_front)){
             getnode(temp_back,temp.back_pos);
             if(temp_back.now_num>size_of_block/2){
-                // temp.value[size_of_block/2-1]=temp_back.value[0];
-                // for(int i=0;i<temp_back.now_num-1;i++)temp_back.value[i]=temp_back.value[i+1];
-                // temp_back.now_num--;
-                // temp.now_num++;
-                // node temp_fa;
-                // getnode(temp_fa,temp.pos_of_fa);
-                // int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
-                //                 temp.value[size_of_block/2-1])-temp_fa.value;
-                // temp_fa.value[t]=temp_back.value[0];
-                // writenode(temp,pos);
-                // writenode(temp_back,temp.back_pos);
-                // writenode(temp_fa,temp.pos_of_fa);
                 for(int i=temp.now_num;i>0;i--)temp.value[i]=temp.value[i-1];
                 temp.value[0]=temp_back.value[temp_back.now_num-1];
                 temp_back.now_num--;
@@ -519,7 +508,10 @@ public:
         node temp;
         getnode(temp,pos);
         int t=sjtu::upper_bound(temp.value,temp.value+temp.now_num,obj)-temp.value;
-        if(!(temp.value[t-1]==obj))return;
+        if(!(temp.value[t-1]==obj)){
+            //test(1);
+            return;
+        }
         t--;
         for(int i=t;i<temp.now_num;i++)temp.value[i]=temp.value[i+1];
         temp.now_num--;
