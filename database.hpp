@@ -52,7 +52,7 @@ public:
             return *this;
         }
     };
-    static const int size_of_block=20;
+    static const int size_of_block=4;
     class start
     {
     public:
@@ -286,22 +286,22 @@ public:
     }
     void test(bool typ){
         //cnt++;
-        if(typ==0)std::cout<<"****************insert"<<'\n';
-        else std::cout<<"****************delete"<<'\n';
-        std::cout<<"root:"<<head.pos_of_root<<'\n';
+        if(typ==0)std::cout<<"****************insert"<<std::endl;
+        else std::cout<<"****************delete"<<std::endl;
+        std::cout<<"root:"<<head.pos_of_root<<std::endl;
         for(int i=1;i<=head.num_of_block;i++){
             node tempx;
             getnode(tempx,i);
-            std::cout<<i<<':'<<'\n';
-            std::cout<<' '<<"now_num="<<tempx.now_num<<'\n';
-            std::cout<<' '<<"back_pos="<<tempx.back_pos<<'\n';
-            std::cout<<' '<<"front_pos="<<tempx.front_pos<<'\n';
-            std::cout<<' '<<"pos_of_fa="<<tempx.pos_of_fa<<'\n';
-            std::cout<<' '<<"type="<<tempx.type<<'\n';
+            std::cout<<i<<':'<<std::endl;
+            std::cout<<' '<<"now_num="<<tempx.now_num<<std::endl;
+            std::cout<<' '<<"back_pos="<<tempx.back_pos<<std::endl;
+            std::cout<<' '<<"front_pos="<<tempx.front_pos<<std::endl;
+            std::cout<<' '<<"pos_of_fa="<<tempx.pos_of_fa<<std::endl;
+            std::cout<<' '<<"type="<<tempx.type<<std::endl;
             for(int j=0;j<tempx.now_num;j++){
-                std::cout<<tempx.value[j].key<<' '<<tempx.value[j].value<<'\n';
+                std::cout<<tempx.value[j].value<<std::endl;
             }
-            std::cout<<'\n'<<'\n';
+            std::cout<<std::endl<<std::endl;
         }
     }
     void insert(char* index,T val){
@@ -345,6 +345,7 @@ public:
     }
     void balanceindex(int pos,data delindex){
         //如果根节点且儿子删完只剩一个则用儿子替代根
+        //std::cout<<"ppppppppppppp "<<delindex.value<<" pppppppppppp"<<std::endl;
         node temp;
         getnode(temp,pos);
         if(pos==head.pos_of_root && temp.now_num==1){
@@ -422,6 +423,7 @@ public:
                 }
             }
         }
+        writenode(temp,pos);
     }
     void balanceleaf(int pos){
         node temp,temp_back,temp_front;
@@ -429,26 +431,26 @@ public:
         if(!temp.back_pos && !temp.front_pos)return;
         if(!judge(temp.back_pos,temp.pos_of_fa,temp_back)){
             getnode(temp_front,temp.front_pos);
-            if(temp_front.now_num>size_of_block/2){
-                temp.value[size_of_block/2-1]=temp_front.value[0];
+            if(temp_front.now_num>size_of_block/2-1){
+                temp.value[size_of_block/2-2]=temp_front.value[0];
                 for(int i=0;i<temp_front.now_num-1;i++)temp_front.value[i]=temp_front.value[i+1];
                 temp_front.now_num--;
                 temp.now_num++;
                 node temp_fa;
                 getnode(temp_fa,temp.pos_of_fa);
                 int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
-                                temp.value[size_of_block/2-1])-temp_fa.value;
+                                temp.value[size_of_block/2-2])-temp_fa.value;
                 temp_fa.value[t-1]=temp_front.value[0];//修改
                 writenode(temp,pos);
                 writenode(temp_front,temp.front_pos);
                 writenode(temp_fa,temp.pos_of_fa);
             }
             else{
-                for(int i=size_of_block/2-1;i<size_of_block-1;i++)
-                    temp.value[i]=temp_front.value[i-(size_of_block/2-1)];
+                for(int i=size_of_block/2-2;i<size_of_block-3;i++)
+                    temp.value[i]=temp_front.value[i-(size_of_block/2-2)];
                 temp.front_pos=temp_front.front_pos;
                 updateleft(temp.front_pos,pos);
-                temp.now_num=size_of_block-1;
+                temp.now_num=size_of_block-3;
                 writenode(temp,pos);
                 balanceindex(temp.pos_of_fa,temp_front.value[0]);
             }
@@ -456,7 +458,7 @@ public:
         }
         if(!judge(temp.front_pos,temp.pos_of_fa,temp_front)){
             getnode(temp_back,temp.back_pos);
-            if(temp_back.now_num>size_of_block/2){
+            if(temp_back.now_num>size_of_block/2-1){
                 for(int i=temp.now_num;i>0;i--)temp.value[i]=temp.value[i-1];
                 temp.value[0]=temp_back.value[temp_back.now_num-1];
                 temp_back.now_num--;
@@ -464,34 +466,34 @@ public:
                 node temp_fa;
                 getnode(temp_fa,temp.pos_of_fa);
                 int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
-                                 temp.value[1])-temp_fa.value;
-                temp_fa.value[t-1]=temp.value[0];
+                                 temp.value[0])-temp_fa.value;
+                temp_fa.value[t]=temp.value[0];
                 writenode(temp,pos);
                 writenode(temp_back,temp.back_pos);
                 writenode(temp_fa,temp.pos_of_fa);
             }
             else{
-                for(int i=size_of_block/2;i<size_of_block-1;i++)
-                    temp_back.value[i]=temp.value[i-size_of_block/2];
+                for(int i=size_of_block/2-1;i<size_of_block-3;i++)
+                    temp_back.value[i]=temp.value[i-size_of_block/2+1];
                 temp_back.front_pos=temp.front_pos;
                 updateleft(temp_back.front_pos,temp.back_pos);
-                temp_back.now_num=size_of_block-1;
+                temp_back.now_num=size_of_block-3;
                 writenode(temp_back,temp.back_pos);
                 balanceindex(temp_back.pos_of_fa,temp.value[0]);
             }
             return;
         }
         //左右都是亲兄弟
-        if(temp_front.now_num>size_of_block/2){
-            temp.value[size_of_block/2-1]=temp_front.value[0];
+        if(temp_front.now_num>size_of_block/2-1){
+            temp.value[size_of_block/2-2]=temp_front.value[0];
             for(int i=0;i<temp_front.now_num-1;i++)temp_front.value[i]=temp_front.value[i+1];
             temp_front.now_num--;
             temp.now_num++;
             node temp_fa;
             getnode(temp_fa,temp.pos_of_fa);
             int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
-                            temp.value[size_of_block/2-1])-temp_fa.value;
-            temp_fa.value[t-1]=temp_front.value[0];
+                            temp.value[size_of_block/2-2])-temp_fa.value;
+            temp_fa.value[t-1]=temp_front.value[0];//修改
             writenode(temp,pos);
             writenode(temp_front,temp.front_pos);
             writenode(temp_fa,temp.pos_of_fa);
@@ -505,18 +507,18 @@ public:
             node temp_fa;
             getnode(temp_fa,temp.pos_of_fa);
             int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
-                                temp.value[1])-temp_fa.value;
-            temp_fa.value[t-1]=temp.value[0];
+                                temp.value[0])-temp_fa.value;
+            temp_fa.value[t]=temp.value[0];
             writenode(temp,pos);
             writenode(temp_back,temp.back_pos);
             writenode(temp_fa,temp.pos_of_fa);
             return;
         }
-        for(int i=size_of_block/2-1;i<size_of_block-1;i++)
-            temp.value[i]=temp_front.value[i-(size_of_block/2-1)];
+        for(int i=size_of_block/2-2;i<size_of_block-3;i++)
+            temp.value[i]=temp_front.value[i-(size_of_block/2-2)];
         temp.front_pos=temp_front.front_pos;
         updateleft(temp.front_pos,pos);
-        temp.now_num=size_of_block-1;
+        temp.now_num=size_of_block-3;
         writenode(temp,pos);
         balanceindex(temp.pos_of_fa,temp_front.value[0]);
     }
@@ -531,10 +533,10 @@ public:
             return;
         }
         t--;
-        for(int i=t;i<temp.now_num;i++)temp.value[i]=temp.value[i+1];
+        for(int i=t;i<temp.now_num-1;i++)temp.value[i]=temp.value[i+1];
         temp.now_num--;
         writenode(temp,pos);
-        if(temp.now_num<size_of_block/2)balanceleaf(pos);
+        if(temp.now_num<size_of_block/2-1)balanceleaf(pos);
         //test(1);
     }
 };
