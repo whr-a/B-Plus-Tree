@@ -185,6 +185,20 @@ public:
         temp.pos_of_fa=fa_pos;
         writenode(temp,pos);
     }
+    void updateleft(int pos,int left){
+        if(pos==0)return;
+        node temp;
+        getnode(temp,pos);
+        temp.back_pos=left;
+        writenode(temp,pos);
+    }
+    void updateright(int pos,int right){
+        if(pos==0)return;
+        node temp;
+        getnode(temp,pos);
+        temp.front_pos=right;
+        writenode(temp,right);
+    }
     void flashindex(int fa_pos,int son_pos,const data &obj){
         node temp;
         getnode(temp,fa_pos);
@@ -241,6 +255,7 @@ public:
         node temp2;
         temp2.back_pos=pos;
         temp2.front_pos=temp1.front_pos;
+        updateleft(temp1.front_pos,head.num_of_block+1);
         temp1.front_pos=head.num_of_block+1;
         for(int i=0;i<size_of_block/2;i++)temp2.value[i]=temp1.value[size_of_block/2+i];
         temp2.now_num=size_of_block/2;
@@ -432,6 +447,7 @@ public:
                 for(int i=size_of_block/2-1;i<size_of_block-1;i++)
                     temp.value[i]=temp_front.value[i-(size_of_block/2-1)];
                 temp.front_pos=temp_front.front_pos;
+                updateleft(temp.front_pos,pos);
                 temp.now_num=size_of_block-1;
                 writenode(temp,pos);
                 balanceindex(temp.pos_of_fa,temp_front.value[0]);
@@ -458,6 +474,7 @@ public:
                 for(int i=size_of_block/2;i<size_of_block-1;i++)
                     temp_back.value[i]=temp.value[i-size_of_block/2];
                 temp_back.front_pos=temp.front_pos;
+                updateleft(temp_back.front_pos,temp.back_pos);
                 temp_back.now_num=size_of_block-1;
                 writenode(temp_back,temp.back_pos);
                 balanceindex(temp_back.pos_of_fa,temp.value[0]);
@@ -498,6 +515,7 @@ public:
         for(int i=size_of_block/2-1;i<size_of_block-1;i++)
             temp.value[i]=temp_front.value[i-(size_of_block/2-1)];
         temp.front_pos=temp_front.front_pos;
+        updateleft(temp.front_pos,pos);
         temp.now_num=size_of_block-1;
         writenode(temp,pos);
         balanceindex(temp.pos_of_fa,temp_front.value[0]);
