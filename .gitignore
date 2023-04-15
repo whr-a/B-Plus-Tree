@@ -14,3 +14,7 @@ ans.cpp
 create
 main_prime.cpp
 code.cbp
+.cmake
+.idea
+tester
+Testing

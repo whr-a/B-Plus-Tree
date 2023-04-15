@@ -52,7 +52,7 @@ public:
             return *this;
         }
     };
-    static const int size_of_block=4;
+    static const int size_of_block=200;
     class start
     {
     public:
@@ -417,7 +417,7 @@ public:
                     writenode(fa,temp.pos_of_fa);
                 }
                 else{
-                    merge(fa.edge[tx-1],leftbro,temp,fa,tx);
+                    merge(fa.edge[tx-1],leftbro,temp,fa,tx-1);
                     writenode(leftbro,fa.edge[tx-1]);
                     balanceindex(temp.pos_of_fa,fa.value[tx-1]);
                 }
@@ -457,7 +457,6 @@ public:
             return;
         }
         if(!judge(temp.front_pos,temp.pos_of_fa,temp_front)){
-            getnode(temp_back,temp.back_pos);
             if(temp_back.now_num>size_of_block/2-1){
                 for(int i=temp.now_num;i>0;i--)temp.value[i]=temp.value[i-1];
                 temp.value[0]=temp_back.value[temp_back.now_num-1];
@@ -484,6 +483,21 @@ public:
             return;
         }
         //左右都是亲兄弟
+        if(temp_back.now_num>size_of_block/2-1){
+            for(int i=temp.now_num;i>0;i--)temp.value[i]=temp.value[i-1];
+            temp.value[0]=temp_back.value[temp_back.now_num-1];
+            temp_back.now_num--;
+            temp.now_num++;
+            node temp_fa;
+            getnode(temp_fa,temp.pos_of_fa);
+            int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
+                                temp.value[0])-temp_fa.value;
+            temp_fa.value[t]=temp.value[0];
+            writenode(temp,pos);
+            writenode(temp_back,temp.back_pos);
+            writenode(temp_fa,temp.pos_of_fa);
+            return;
+        }
         if(temp_front.now_num>size_of_block/2-1){
             temp.value[size_of_block/2-2]=temp_front.value[0];
             for(int i=0;i<temp_front.now_num-1;i++)temp_front.value[i]=temp_front.value[i+1];
@@ -499,21 +513,6 @@ public:
             writenode(temp_fa,temp.pos_of_fa);
             return;
         }
-        if(temp_back.now_num>size_of_block/2){
-            for(int i=temp.now_num;i>0;i--)temp.value[i]=temp.value[i-1];
-            temp.value[0]=temp_back.value[temp_back.now_num-1];
-            temp_back.now_num--;
-            temp.now_num++;
-            node temp_fa;
-            getnode(temp_fa,temp.pos_of_fa);
-            int t=sjtu::upper_bound(temp_fa.value,temp_fa.value+temp_fa.now_num,
-                                temp.value[0])-temp_fa.value;
-            temp_fa.value[t]=temp.value[0];
-            writenode(temp,pos);
-            writenode(temp_back,temp.back_pos);
-            writenode(temp_fa,temp.pos_of_fa);
-            return;
-        }
         for(int i=size_of_block/2-2;i<size_of_block-3;i++)
             temp.value[i]=temp_front.value[i-(size_of_block/2-2)];
         temp.front_pos=temp_front.front_pos;
@@ -521,6 +520,17 @@ public:
         temp.now_num=size_of_block-3;
         writenode(temp,pos);
         balanceindex(temp.pos_of_fa,temp_front.value[0]);
+    }
+    void freshleft(int pos,const data &obj){
+        if(pos==0)return;
+        node temp;
+        getnode(temp,pos);
+        int t=sjtu::upper_bound(temp.value,temp.value+temp.now_num,obj)-temp.value;
+        if(t!=0){
+            temp.value[t-1]=obj;
+            writenode(temp,pos);
+        }
+        else freshleft(temp.pos_of_fa,obj);
     }
     void erase(char* key,T val){
         data obj(key,val);
@@ -533,6 +543,49 @@ public:
             return;
         }
         t--;
+        if(t==0 && head.pos_of_root!=pos){
+            if(temp.now_num!=1){
+                node fa;
+                getnode(fa,temp.pos_of_fa);
+                int t1=sjtu::upper_bound(fa.value,fa.value+fa.now_num,temp.value[0])-fa.value;
+                if(t1!=0){
+                    fa.value[t1-1]=temp.value[1];
+                    writenode(fa,temp.pos_of_fa);
+                }
+                else freshleft(fa.pos_of_fa,temp.value[1]);
+            }
+            else{//专门为块的大小为4而写
+                node fa;
+                getnode(fa,temp.pos_of_fa);
+                node left,right;
+                if(!judge(temp.back_pos,temp.pos_of_fa,left)){
+                    getnode(right,temp.front_pos);
+                    int t1=sjtu::upper_bound(fa.value,fa.value+fa.now_num,temp.value[0])-fa.value;
+                    if(t1!=0){
+                        fa.value[t1-1]=right.value[0];
+                        writenode(fa,temp.pos_of_fa);
+                    }
+                    else freshleft(fa.pos_of_fa,right.value[0]);
+                }
+                else if(!judge(temp.front_pos,temp.pos_of_fa,right)){
+                    int t1=sjtu::upper_bound(fa.value,fa.value+fa.now_num,temp.value[0])-fa.value;
+                    if(t1!=0){
+                        fa.value[t1-1]=left.value[left.now_num-1];
+                        writenode(fa,temp.pos_of_fa);
+                    }
+                    else freshleft(fa.pos_of_fa,left.value[left.now_num-1]);
+                }
+                else{
+                    getnode(right,temp.front_pos);
+                    int t1=sjtu::upper_bound(fa.value,fa.value+fa.now_num,temp.value[0])-fa.value;
+                    if(t1!=0){
+                        fa.value[t1-1]=right.value[0];
+                        writenode(fa,temp.pos_of_fa);
+                    }
+                    else freshleft(fa.pos_of_fa,right.value[0]);
+                }
+            }
+        }
         for(int i=t;i<temp.now_num-1;i++)temp.value[i]=temp.value[i+1];
         temp.now_num--;
         writenode(temp,pos);
