@@ -326,12 +326,6 @@ public:
         if(temp.pos_of_fa!=fa)return false;
         return true;
     }
-    data getleft(int pos){
-        node temp;
-        getnode(temp,pos);
-        if(temp.type==leaf)return temp.value[0];
-        else return getleft(temp.edge[0]);
-    }
     void merge(int pos,node &obj1,node &obj2,node &fa,int tx){
         obj1.value[obj1.now_num]=fa.value[tx];
         obj1.now_num++;
@@ -378,6 +372,7 @@ public:
                     temp.edge[size_of_block/2-1]=rightbro.edge[0];
                     updatefather(rightbro.edge[0],pos);
                     temp.value[size_of_block/2-2]=fa.value[tx];
+                    fa.value[tx]=rightbro.value[0];
                     for(int i=0;i<rightbro.now_num-1;i++){
                         rightbro.value[i]=rightbro.value[i+1];
                         rightbro.edge[i]=rightbro.edge[i+1];
@@ -385,7 +380,6 @@ public:
                     rightbro.edge[rightbro.now_num-1]=rightbro.edge[rightbro.now_num];
                     rightbro.now_num--;
                     temp.now_num++;
-                    fa.value[tx]=getleft(rightbro.edge[0]);
                     writenode(temp,pos);
                     writenode(rightbro,fa.edge[tx+1]);
                     writenode(fa,temp.pos_of_fa);
@@ -411,14 +405,14 @@ public:
                     temp.edge[1]=temp.edge[0];
                     temp.edge[0]=leftbro.edge[leftbro.now_num];
                     temp.value[0]=fa.value[fa.now_num-1];
-                    node xx;
-                    getnode(xx,temp.edge[0]);
-                    xx.pos_of_fa=pos;
-                    writenode(xx,temp.edge[0]);
+                    // node xx;
+                    // getnode(xx,temp.edge[0]);
+                    // xx.pos_of_fa=pos;
+                    // writenode(xx,temp.edge[0]);
+                    updatefather(temp.edge[0],pos);
                     temp.now_num++;
                     leftbro.now_num--;
-                    if(xx.type==leaf)fa.value[tx-1]=xx.value[0];
-                    else fa.value[tx-1]=getleft(xx.edge[0]);
+                    fa.value[tx-1]=leftbro.value[leftbro.now_num];
                     writenode(temp,pos);
                     writenode(leftbro,fa.edge[tx-1]);
                     writenode(fa,temp.pos_of_fa);
