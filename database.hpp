@@ -127,6 +127,7 @@ public:
         getnode(temp,num);
         if(temp.type==leaf)return num;
         int t=sjtu::upper_bound(temp.value,temp.value+temp.now_num,data(key,T()))-temp.value;
+        //if(temp.edge[t]>head.num_of_block)std::cout<<114514<<std::endl;
         return finds(key,temp.edge[t]);
     }
     sjtu::vector<T> find(char* key){
@@ -176,6 +177,7 @@ public:
         if(temp.type==leaf)return num;
         else{
             int t=sjtu::upper_bound(temp.value,temp.value+temp.now_num,obj)-temp.value;
+            //if(temp.edge[t]>head.num_of_block)std::cout<<114514<<std::endl;
             return find_pos(obj,temp.edge[t]);
         }
     }
@@ -345,7 +347,6 @@ public:
     }
     void balanceindex(int pos,data delindex){
         //如果根节点且儿子删完只剩一个则用儿子替代根
-        //std::cout<<"ppppppppppppp "<<delindex.value<<" pppppppppppp"<<std::endl;
         node temp;
         getnode(temp,pos);
         if(pos==head.pos_of_root && temp.now_num==1){
@@ -356,6 +357,7 @@ public:
             writenode(son,temp.edge[0]);
             return;
         }
+        // if(temp.now_num==1)std::cout<<"it's impossible"<<std::endl;
         int t=sjtu::upper_bound(temp.value,temp.value+temp.now_num,delindex)-temp.value;
         for(int i=t-1;i<temp.now_num-1;i++)temp.value[i]=temp.value[i+1];
         for(int i=t;i<temp.now_num;i++)temp.edge[i]=temp.edge[i+1];
@@ -364,6 +366,7 @@ public:
             writenode(temp,pos);
             return;
         }
+        
         if(temp.now_num<size_of_block/2-1){
             node fa;
             getnode(fa,temp.pos_of_fa);
@@ -395,6 +398,10 @@ public:
             }
             else{
                 node leftbro;
+                if(tx==0){
+                    std::cout<<"wrong "<<temp.pos_of_fa<<' '<<std::endl;
+                    std::cout<<fa.now_num<<' '<<fa.edge[0]<<' '<<fa.edge[1]<<std::endl;
+                }
                 getnode(leftbro,fa.edge[tx-1]);
                 if(leftbro.now_num>=size_of_block/2){
                     for(int i=temp.now_num;i>0;i--){
@@ -423,7 +430,7 @@ public:
                 }
             }
         }
-        writenode(temp,pos);
+        else writenode(temp,pos);
     }
     void balanceleaf(int pos){
         node temp,temp_back,temp_front;
@@ -538,6 +545,7 @@ public:
         node temp;
         getnode(temp,pos);
         int t=sjtu::upper_bound(temp.value,temp.value+temp.now_num,obj)-temp.value;
+        //if(t==0)std::cout<<114514<<std::endl;
         if(!(temp.value[t-1]==obj)){
             //test(1);
             return;
@@ -588,6 +596,7 @@ public:
         }
         for(int i=t;i<temp.now_num-1;i++)temp.value[i]=temp.value[i+1];
         temp.now_num--;
+        //if(temp.now_num==0 && head.pos_of_root!=pos)std::cout<<"it's impossible"<<std::endl;
         writenode(temp,pos);
         if(temp.now_num<size_of_block/2-1)balanceleaf(pos);
         //test(1);
