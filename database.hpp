@@ -52,7 +52,7 @@ public:
             return *this;
         }
     };
-    static const int size_of_block=200;
+    static const int size_of_block=6;
     class start
     {
     public:
